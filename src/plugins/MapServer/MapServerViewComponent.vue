@@ -21,11 +21,42 @@
  *****************************************************************************/
 
 <template>
-<div class="l-iframe abs">
-    <iframe
-        :src="domainObject.url"
-        :name="domainObject.id"
-    ></iframe>
+<div class="">
+    <div class="">
+        <label for="longitude">
+            <div class="c-labeled-input__label">Longitude</div>
+        </label>
+        <input
+            id="longitude"
+            v-model="input.longitude"
+            type="text"
+        >
+        <label for="latitude">
+            <div class="c-labeled-input__label">Latitude</div>
+        </label>
+        <input
+            id="latitude"
+            v-model="input.latitude"
+            type="text"
+        >
+        <button
+            class="c-button c-button--major"
+            @click="zoomMap()"
+        >
+            GO
+        </button>
+    </div>
+    <div
+        v-if="hasLastPoint"
+    >
+        Layer: {{ lastPoint.layer }} - Longitude, Latitude {{ lastPoint.longitude }}deg, {{ lastPoint.latitude }}deg
+    </div>
+    <div class="l-iframe">
+        <iframe
+            :src="domainObject.url"
+            :name="domainObject.id"
+        ></iframe>
+    </div>
 </div>
 </template>
 
@@ -38,33 +69,59 @@ export default {
             required: true
         }
     },
+    data() {
+        return {
+            input: {
+                layer: '',
+                longitude: '',
+                latitude: ''
+            },
+            lastPoint: {
+                layer: 'Test',
+                longitude: 137.123,
+                latitude: -4.3234
+            }
+        };
+    },
+    computed: {
+        hasLastPoint() {
+            return this.lastPoint.layer !== undefined
+                && this.lastPoint.longitude !== undefined
+                && this.lastPoint.latitude !== undefined;
+        }
+    },
     destroyed() {
         window.removeEventListener('message', this.handleMessage);
     },
     mounted() {
         let mmgis = window.frames[this.domainObject.id];
-        console.log(mmgis);
 
-        window.addEventListener('message', this.handleMessage);
+        window.addEventListener('message', this.setLastPoint);
     },
     methods: {
-        handleMessage(event) {
-            console.log(event);
-
-            const { origin } = event;
+        zoomMap() {
+            this.postMessage(this.input);
+        },
+        setLastPoint(event) {
+            console.log('event');
+            const { origin, data } = event;
 
             if (origin !== this.domainObject.url) {
                 console.warn(`Message received from unknown origin: ${origin}`);
-
-                return;
             }
 
-            // something
+            this.lastPoint = data;
         },
         postMessage(message) {
             const target = window.frames[this.domainObject.id];
 
-            target.postMessage(message, this.domainObject.url);
+            // target.postMessage(message, this.domainObject.url);
+            target.postMessage(message, '*');
+},
+        clearLastPoint() {
+            this.lastPoint.layer = undefined;
+            this.lastPoint.longitude = undefined;
+            this.lastPoint.latitude = undefined;
         }
     }
 };
