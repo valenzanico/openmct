@@ -21,7 +21,7 @@
  *****************************************************************************/
 
 <template>
-<div class="">
+<div class="container">
     <div class="">
         <label for="longitude">
             <div class="c-labeled-input__label">Longitude</div>
@@ -45,13 +45,13 @@
         >
             GO
         </button>
+        <div
+            v-if="hasLastPoint"
+        >
+            Layer: {{ lastPoint.layer }} - Longitude, Latitude {{ lastPoint.longitude }}deg, {{ lastPoint.latitude }}deg
+        </div>
     </div>
-    <div
-        v-if="hasLastPoint"
-    >
-        Layer: {{ lastPoint.layer }} - Longitude, Latitude {{ lastPoint.longitude }}deg, {{ lastPoint.latitude }}deg
-    </div>
-    <div class="l-iframe">
+    <div class="l-iframe stretch">
         <iframe
             :src="domainObject.url"
             :name="domainObject.id"
@@ -59,6 +59,20 @@
     </div>
 </div>
 </template>
+
+<style lang="scss" scoped>
+    .container {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        height: 100%;
+    }
+
+    .stretch {
+        height: 100%;
+        width: auto;
+    }
+</style>
 
 <script>
 export default {
