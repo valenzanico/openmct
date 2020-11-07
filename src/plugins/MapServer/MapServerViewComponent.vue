@@ -21,7 +21,14 @@
  *****************************************************************************/
 
 <template>
-<div class="container">
+<div style="
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+">
     <div class="">
         <label for="longitude">
             <div class="c-labeled-input__label">Longitude</div>
@@ -51,7 +58,13 @@
             Layer: {{ lastPoint.layer }} - Longitude, Latitude {{ lastPoint.longitude }}deg, {{ lastPoint.latitude }}deg
         </div>
     </div>
-    <div class="l-iframe stretch">
+    <div
+        class="l-iframe"
+        style="
+            height: 100%;
+            width: auto;
+        "
+    >
         <iframe
             :src="domainObject.url"
             :name="domainObject.id"
@@ -59,20 +72,6 @@
     </div>
 </div>
 </template>
-
-<style lang="scss" scoped>
-    .container {
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-        height: 100%;
-    }
-
-    .stretch {
-        height: 100%;
-        width: auto;
-    }
-</style>
 
 <script>
 export default {
