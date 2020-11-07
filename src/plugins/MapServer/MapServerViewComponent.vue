@@ -35,7 +35,7 @@
         </label>
         <input
             id="longitude"
-            v-model="input.longitude"
+            v-model="input.lon"
             type="text"
         >
         <label for="latitude">
@@ -43,7 +43,7 @@
         </label>
         <input
             id="latitude"
-            v-model="input.latitude"
+            v-model="input.lat"
             type="text"
         >
         <button
@@ -55,7 +55,7 @@
         <div
             v-if="hasLastPoint"
         >
-            Layer: {{ lastPoint.layer }} - Longitude, Latitude {{ lastPoint.longitude }}deg, {{ lastPoint.latitude }}deg
+            Layer: {{ lastPoint.layerName }} - Longitude, Latitude {{ lastPoint.lon }}deg, {{ lastPoint.lat }}deg
         </div>
     </div>
     <div
@@ -85,22 +85,22 @@ export default {
     data() {
         return {
             input: {
-                layer: '',
-                longitude: '',
-                latitude: ''
+                layerName: '',
+                lon: '',
+                lat: ''
             },
             lastPoint: {
-                layer: 'Test',
-                longitude: 137.123,
-                latitude: -4.3234
+                layerName: undefined,
+                lon: undefined,
+                lat: undefined
             }
         };
     },
     computed: {
         hasLastPoint() {
-            return this.lastPoint.layer !== undefined
-                && this.lastPoint.longitude !== undefined
-                && this.lastPoint.latitude !== undefined;
+            return this.lastPoint.layerName !== undefined
+                && this.lastPoint.lon !== undefined
+                && this.lastPoint.lat !== undefined;
         }
     },
     destroyed() {
@@ -116,14 +116,22 @@ export default {
             this.postMessage(this.input);
         },
         setLastPoint(event) {
-            console.log('event');
             const { origin, data } = event;
+            const { layerName, lon, lat } = data;
 
             if (origin !== this.domainObject.url) {
                 console.warn(`Message received from unknown origin: ${origin}`);
             }
 
-            this.lastPoint = data;
+            this.lastPoint = Object.assign(
+                {},
+                this.lastPoint,
+                {
+                    layerName: layerName,
+                    lon: lon,
+                    lat: lat
+                }
+            );
         },
         postMessage(message) {
             const target = window.frames[this.domainObject.id];
@@ -132,9 +140,9 @@ export default {
             target.postMessage(message, '*');
 },
         clearLastPoint() {
-            this.lastPoint.layer = undefined;
-            this.lastPoint.longitude = undefined;
-            this.lastPoint.latitude = undefined;
+            this.lastPoint.layerName = undefined;
+            this.lastPoint.lon = undefined;
+            this.lastPoint.lat = undefined;
         }
     }
 };
