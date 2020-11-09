@@ -48,14 +48,24 @@
         >
         <button
             class="c-button c-button--major"
-            @click="zoomMap()"
+            @click="zoomMap(input)"
         >
             GO
         </button>
+
+        <ul>
+            <li
+                v-for="(point, index) in points"
+                :key="index"
+                @click="zoomMap(point)"
+            >
+                Layer: {{ point.layerName }} - Longitude, Latitude {{ point.lon }}, {{ point.lat }}
+            </li>
+        </ul>
         <div
             v-if="hasLastPoint"
         >
-            Layer: {{ lastPoint.layerName }} - Longitude, Latitude {{ lastPoint.lon }}deg, {{ lastPoint.lat }}deg
+            Last Point from Map - Layer: {{ lastPoint.layerName }} - Longitude, Latitude {{ lastPoint.lon }}, {{ lastPoint.lat }}
         </div>
     </div>
     <div
@@ -93,7 +103,8 @@ export default {
                 layerName: undefined,
                 lon: undefined,
                 lat: undefined
-            }
+            },
+            points: []
         };
     },
     computed: {
@@ -112,8 +123,8 @@ export default {
         window.addEventListener('message', this.setLastPoint);
     },
     methods: {
-        zoomMap() {
-            this.postMessage(this.input);
+        zoomMap(point) {
+            this.postMessage(point);
         },
         setLastPoint(event) {
             const { origin, data } = event;
@@ -132,6 +143,19 @@ export default {
                     lat: lat
                 }
             );
+
+            this.savePoint(this.lastPoint);
+        },
+        savePoint(point) {
+            const pointExists = this.points.some(existingPoint => {
+                return point.lat === existingPoint.lat
+                    && point.lon === existingPoint.lon
+                    && point.layerName === existingPoint.layerName;
+            });
+
+            if (!pointExists) {
+                this.points.push(point);
+            }
         },
         postMessage(message) {
             const target = window.frames[this.domainObject.id];
