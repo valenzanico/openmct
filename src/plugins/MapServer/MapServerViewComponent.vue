@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import { testRoverWaypoints } from './testRoverWaypoints';
+import { testRoverWaypoints } from './roverWaypoints';
 
 export default {
     inject: ['openmct'],
