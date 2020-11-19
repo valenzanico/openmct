@@ -52,7 +52,6 @@
         >
             GO
         </button>
-
         <ul>
             <li
                 v-for="(point, index) in points"
@@ -66,6 +65,23 @@
             v-if="hasLastPoint"
         >
             Last Point from Map - Layer: {{ lastPoint.layerName }} - Longitude, Latitude {{ lastPoint.lon }}, {{ lastPoint.lat }}
+        </div>
+
+        <div>
+            <button
+                v-if="!isRoverMoving"
+                class="c-button c-button--major"
+                @click="moveRover()"
+            >
+                START ROVER
+            </button>
+            <button
+                v-else
+                class="c-button c-button--major"
+                @click="stopRover()"
+            >
+                STOP ROVER
+            </button>
         </div>
     </div>
     <div
@@ -84,6 +100,8 @@
 </template>
 
 <script>
+import { roverWaypoints } from './roverWaypoints';
+
 export default {
     inject: ['openmct'],
     props: {
@@ -104,7 +122,10 @@ export default {
                 lon: undefined,
                 lat: undefined
             },
-            points: []
+            points: [],
+            isRoverMoving: false,
+            currentRoverWaypoint: 0,
+            roverIntervalId: undefined
         };
     },
     computed: {
@@ -118,7 +139,7 @@ export default {
         window.removeEventListener('message', this.handleMessage);
     },
     mounted() {
-        let mmgis = window.frames[this.domainObject.id];
+        this.mmgis = window.frames[this.domainObject.id];
 
         window.addEventListener('message', this.setLastPoint);
     },
@@ -158,15 +179,31 @@ export default {
             }
         },
         postMessage(message) {
-            const target = window.frames[this.domainObject.id];
-
             // target.postMessage(message, this.domainObject.url);
-            target.postMessage(message, '*');
+            this.mmgis.postMessage(message, '*');
 },
         clearLastPoint() {
             this.lastPoint.layerName = undefined;
             this.lastPoint.lon = undefined;
             this.lastPoint.lat = undefined;
+        },
+        moveRover() {
+            this.isRoverMoving = true;
+
+            this.roverIntervalId = window.setInterval(() => {
+                if (this.currentRoverWaypoint >= roverWaypoints.length) {
+                    this.currentRoverWaypoint = 0;
+                }
+
+                this.postMessage(roverWaypoints[this.currentRoverWaypoint]);
+
+                this.currentRoverWaypoint += 1;
+            }, 500);
+        },
+        stopRover() {
+            window.clearInterval(this.roverIntervalId);
+
+            this.isRoverMoving = false;
         }
     }
 };
