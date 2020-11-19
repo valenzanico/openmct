@@ -100,7 +100,7 @@
 </template>
 
 <script>
-import { roverWaypoints } from './roverWaypoints';
+import { testRoverWaypoints } from './testRoverWaypoints';
 
 export default {
     inject: ['openmct'],
@@ -191,13 +191,13 @@ export default {
             this.isRoverMoving = true;
 
             this.roverIntervalId = window.setInterval(() => {
-                if (this.currentRoverWaypoint >= roverWaypoints.length) {
+                if (this.currentRoverWaypoint >= testRoverWaypoints.length) {
                     this.currentRoverWaypoint = 0;
                 }
 
-                this.skipWaypointsIfOutOfBounds();
+                // this.skipWaypointsIfOutOfBounds();
 
-                this.postMessage(roverWaypoints[this.currentRoverWaypoint]);
+                this.postMessage(testRoverWaypoints[this.currentRoverWaypoint]);
 
                 this.currentRoverWaypoint += 1;
             }, 500);
@@ -206,10 +206,10 @@ export default {
             const longituteBounds = [137.36759156, 137.37300222];
             const latitudeBounds = [-4.66408400, -4.66945736];
 
-            while (roverWaypoints[this.currentRoverWaypoint].lon > longituteBounds[1]
-                || roverWaypoints[this.currentRoverWaypoint].lon < longituteBounds[0]
-                || roverWaypoints[this.currentRoverWaypoint].lat > latitudeBounds[1]
-                || roverWaypoints[this.currentRoverWaypoint].lat < latitudeBounds[0]
+            while (testRoverWaypoints[this.currentRoverWaypoint].lon > longituteBounds[1]
+                || testRoverWaypoints[this.currentRoverWaypoint].lon < longituteBounds[0]
+                || testRoverWaypoints[this.currentRoverWaypoint].lat > latitudeBounds[1]
+                || testRoverWaypoints[this.currentRoverWaypoint].lat < latitudeBounds[0]
             ) {
                 this.currentRoverWaypoint += 1;
             }
