@@ -195,10 +195,24 @@ export default {
                     this.currentRoverWaypoint = 0;
                 }
 
+                this.skipWaypointsIfOutOfBounds();
+
                 this.postMessage(roverWaypoints[this.currentRoverWaypoint]);
 
                 this.currentRoverWaypoint += 1;
             }, 500);
+        },
+        skipWaypointsIfOutOfBounds() {
+            const longituteBounds = [137.36759156, 137.37300222];
+            const latitudeBounds = [-4.66408400, -4.66945736];
+
+            while (roverWaypoints[this.currentRoverWaypoint].lon > longituteBounds[1]
+                || roverWaypoints[this.currentRoverWaypoint].lon < longituteBounds[0]
+                || roverWaypoints[this.currentRoverWaypoint].lat > latitudeBounds[1]
+                || roverWaypoints[this.currentRoverWaypoint].lat < latitudeBounds[0]
+            ) {
+                this.currentRoverWaypoint += 1;
+            }
         },
         stopRover() {
             window.clearInterval(this.roverIntervalId);
