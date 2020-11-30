@@ -453,12 +453,12 @@ export const roverWaypoints = [
 // 137.37300222
 // -4.66945736
 export const testRoverWaypoints = [
-    {"lon": 137.37280222, "lat": -4.66945736, "rot": 90},
-    {"lon": 137.37200222, "lat": -4.66905736, "rot": 90},
-    {"lon": 137.37100222, "lat": -4.66865736, "rot": 90},
-    {"lon": 137.37089512564558, "lat": -4.668504145359644, "rot": 90},
-    {"lon": 137.37029512564558, "lat": -4.668004145359644, "rot": 90},
-    {"lon": 137.37031942868563, "lat": -4.66799186084682, "rot": 220},
-    {"lon": 137.37033257107714, "lat": -4.667996978774516, "rot": 240},
-    {"lon": 137.37024003873523, "lat": -4.667983634858819, "rot": 250}
+    {"type":"roverLocationOrientation", "lon": 137.37280222, "lat": -4.66945736, "rot": 90},
+    {"type":"roverLocationOrientation", "lon": 137.37200222, "lat": -4.66905736, "rot": 90},
+    {"type":"roverLocationOrientation", "lon": 137.37100222, "lat": -4.66865736, "rot": 90},
+    {"type":"roverLocationOrientation", "lon": 137.37089512564558, "lat": -4.668504145359644, "rot": 90},
+    {"type":"roverLocationOrientation", "lon": 137.37029512564558, "lat": -4.668004145359644, "rot": 90},
+    {"type":"roverLocationOrientation", "lon": 137.37031942868563, "lat": -4.66799186084682, "rot": 220},
+    {"type":"roverLocationOrientation", "lon": 137.37033257107714, "lat": -4.667996978774516, "rot": 240},
+    {"type":"roverLocationOrientation", "lon": 137.37024003873523, "lat": -4.667983634858819, "rot": 250}
 ];
