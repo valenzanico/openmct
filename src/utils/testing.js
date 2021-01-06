@@ -90,6 +90,28 @@ export function resetApplicationState(openmct) {
     return promise;
 }
 
+// required: key
+// optional: element, keyCode, type
+export function simulateKeyEvent(opts) {
+
+    if (!opts.key) {
+        console.warn('simulateKeyEvent needs a key');
+
+        return;
+    }
+
+    const el = opts.element || document;
+    const key = opts.key;
+    const keyCode = opts.keyCode || key;
+    const type = opts.type || 'keydown';
+    const event = new Event(type);
+
+    event.keyCode = keyCode;
+    event.key = key;
+
+    el.dispatchEvent(event);
+}
+
 function clearBuiltinSpy(funcDefinition) {
     funcDefinition.object[funcDefinition.functionName] = funcDefinition.nativeFunction;
 }
@@ -193,11 +215,7 @@ export function getMockObjects(opts = {}) {
     if (opts.overwrite) {
         for (let mock in requestedMocks) {
             if (opts.overwrite[mock]) {
-                for (let key in opts.overwrite[mock]) {
-                    if (Object.prototype.hasOwnProperty.call(opts.overwrite[mock], key)) {
-                        requestedMocks[mock][key] = opts.overwrite[mock][key];
-                    }
-                }
+                requestedMocks[mock] = Object.assign(requestedMocks[mock], opts.overwrite[mock]);
             }
         }
     }
@@ -254,6 +272,16 @@ function copyObj(obj) {
 function setMockObjects() {
     return {
         default: {
+            folder: {
+                identifier: {
+                    namespace: "",
+                    key: "folder-object"
+                },
+                name: "Test Folder Object",
+                type: "folder",
+                composition: [],
+                location: "mine"
+            },
             ladTable: {
                 identifier: {
                     namespace: "",

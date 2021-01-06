@@ -57,7 +57,9 @@ export default class ConditionManager extends EventEmitter {
             return;
         }
 
-        this.telemetryObjects[id] = Object.assign({}, endpoint, {telemetryMetaData: this.openmct.telemetry.getMetadata(endpoint).valueMetadatas});
+        const metadata = this.openmct.telemetry.getMetadata(endpoint);
+
+        this.telemetryObjects[id] = Object.assign({}, endpoint, {telemetryMetaData: metadata ? metadata.valueMetadatas : []});
         this.subscriptions[id] = this.openmct.telemetry.subscribe(
             endpoint,
             this.telemetryReceived.bind(this, endpoint)
@@ -77,6 +79,17 @@ export default class ConditionManager extends EventEmitter {
         delete this.subscriptions[id];
         delete this.telemetryObjects[id];
         this.removeConditionTelemetryObjects();
+
+        //force re-computation of condition set result as we might be in a state where
+        // there is no telemetry datum coming in for a while or at all.
+        let latestTimestamp = getLatestTimestamp(
+            {},
+            {},
+            this.timeSystems,
+            this.openmct.time.timeSystem()
+        );
+        this.updateConditionResults({id: id});
+        this.updateCurrentCondition(latestTimestamp);
     }
 
     initialize() {
@@ -123,11 +136,17 @@ export default class ConditionManager extends EventEmitter {
         }
     }
 
-    updateCondition(conditionConfiguration, index) {
-        let condition = this.conditions[index];
-        this.conditionSetDomainObject.configuration.conditionCollection[index] = conditionConfiguration;
-        condition.update(conditionConfiguration);
-        this.persistConditions();
+    updateCondition(conditionConfiguration) {
+        let condition = this.findConditionById(conditionConfiguration.id);
+        if (condition) {
+            condition.update(conditionConfiguration);
+        }
+
+        let index = this.conditionSetDomainObject.configuration.conditionCollection.findIndex(item => item.id === conditionConfiguration.id);
+        if (index > -1) {
+            this.conditionSetDomainObject.configuration.conditionCollection[index] = conditionConfiguration;
+            this.persistConditions();
+        }
     }
 
     updateConditionDescription(condition) {
@@ -200,12 +219,18 @@ export default class ConditionManager extends EventEmitter {
         this.persistConditions();
     }
 
-    removeCondition(index) {
-        let condition = this.conditions[index];
-        condition.destroy();
-        this.conditions.splice(index, 1);
-        this.conditionSetDomainObject.configuration.conditionCollection.splice(index, 1);
-        this.persistConditions();
+    removeCondition(id) {
+        let index = this.conditions.findIndex(item => item.id === id);
+        if (index > -1) {
+            this.conditions[index].destroy();
+            this.conditions.splice(index, 1);
+        }
+
+        let conditionCollectionIndex = this.conditionSetDomainObject.configuration.conditionCollection.findIndex(item => item.id === id);
+        if (conditionCollectionIndex > -1) {
+            this.conditionSetDomainObject.configuration.conditionCollection.splice(conditionCollectionIndex, 1);
+            this.persistConditions();
+        }
     }
 
     findConditionById(id) {
@@ -218,8 +243,8 @@ export default class ConditionManager extends EventEmitter {
         reorderPlan.forEach((reorderEvent) => {
             let item = oldConditions[reorderEvent.oldIndex];
             newCollection.push(item);
-            this.conditionSetDomainObject.configuration.conditionCollection = newCollection;
         });
+        this.conditionSetDomainObject.configuration.conditionCollection = newCollection;
         this.persistConditions();
     }
 
@@ -322,11 +347,17 @@ export default class ConditionManager extends EventEmitter {
         let timestamp = {};
         timestamp[timeSystemKey] = normalizedDatum[timeSystemKey];
 
-        this.conditions.forEach(condition => {
-            condition.getResult(normalizedDatum);
-        });
-
+        this.updateConditionResults(normalizedDatum);
         this.updateCurrentCondition(timestamp);
+    }
+
+    updateConditionResults(normalizedDatum) {
+        //We want to stop when the first condition evaluates to true.
+        this.conditions.some((condition) => {
+            condition.updateResult(normalizedDatum);
+
+            return condition.result === true;
+        });
     }
 
     updateCurrentCondition(timestamp) {

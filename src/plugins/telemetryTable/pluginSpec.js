@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Open MCT, Copyright (c) 2014-2018, United States Government
+ * Open MCT, Copyright (c) 2014-2020, United States Government
  * as represented by the Administrator of the National Aeronautics and Space
  * Administration. All rights reserved.
  *
@@ -168,6 +168,8 @@ describe("the plugin", () => {
                 return telemetryPromise;
             });
 
+            openmct.router.path = [testTelemetryObject];
+
             applicableViews = openmct.objectViews.get(testTelemetryObject);
             tableViewProvider = applicableViews.find((viewProvider) => viewProvider.key === 'table');
             tableView = tableViewProvider.view(testTelemetryObject, [testTelemetryObject]);
@@ -183,10 +185,11 @@ describe("the plugin", () => {
 
         it("Renders a column for every item in telemetry metadata", () => {
             let headers = element.querySelectorAll('span.c-telemetry-table__headers__label');
-            expect(headers.length).toBe(3);
-            expect(headers[0].innerText).toBe('Time');
-            expect(headers[1].innerText).toBe('Some attribute');
-            expect(headers[2].innerText).toBe('Another attribute');
+            expect(headers.length).toBe(4);
+            expect(headers[0].innerText).toBe('Name');
+            expect(headers[1].innerText).toBe('Time');
+            expect(headers[2].innerText).toBe('Some attribute');
+            expect(headers[3].innerText).toBe('Another attribute');
         });
 
         it("Supports column reordering via drag and drop", () => {

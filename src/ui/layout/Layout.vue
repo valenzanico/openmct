@@ -5,6 +5,11 @@
         'is-editing': isEditing
     }"
 >
+
+    <div
+        id="splash-screen"
+    ></div>
+
     <div
         class="l-shell__head"
         :class="{
@@ -15,7 +20,9 @@
         <CreateButton class="l-shell__create-button" />
         <indicators class="l-shell__head-section l-shell__indicators" />
         <button
-            class="l-shell__head__collapse-button c-button"
+            class="l-shell__head__collapse-button c-icon-button"
+            :class="headExpanded ? 'l-shell__head__collapse-button--collapse' : 'l-shell__head__collapse-button--expand'"
+            :title="`Click to ${headExpanded ? 'collapse' : 'expand'} items`"
             @click="toggleShellHead"
         ></button>
         <notification-banner />
@@ -47,12 +54,24 @@
             label="Browse"
             collapsable
         >
-            <mct-tree class="l-shell__tree" />
+            <button
+                slot="controls"
+                class="c-icon-button l-shell__sync-tree-button icon-target"
+                title="Show selected item in tree"
+                @click="handleSyncTreeNavigation"
+            >
+            </button>
+            <mct-tree
+                :sync-tree-navigation="triggerSync"
+                class="l-shell__tree"
+            />
         </pane>
         <pane class="l-shell__pane-main">
             <browse-bar
                 ref="browseBar"
                 class="l-shell__main-view-browse-bar"
+                :action-collection="actionCollection"
+                @sync-tree-navigation="handleSyncTreeNavigation"
             />
             <toolbar
                 v-if="toolbar"
@@ -61,8 +80,9 @@
             <object-view
                 ref="browseObject"
                 class="l-shell__main-container"
-                :show-edit-view="true"
                 data-selectable
+                :show-edit-view="true"
+                @change-action-collection="setActionCollection"
             />
             <component
                 :is="conductorComponent"
@@ -126,6 +146,8 @@ export default {
             conductorComponent: undefined,
             isEditing: false,
             hasToolbar: false,
+            actionCollection: undefined,
+            triggerSync: false,
             headExpanded
         };
     },
@@ -200,6 +222,12 @@ export default {
             }
 
             this.hasToolbar = structure.length > 0;
+        },
+        setActionCollection(actionCollection) {
+            this.actionCollection = actionCollection;
+        },
+        handleSyncTreeNavigation() {
+            this.triggerSync = !this.triggerSync;
         }
     }
 };

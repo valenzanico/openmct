@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Open MCT, Copyright (c) 2014-2018, United States Government
+ * Open MCT, Copyright (c) 2014-2020, United States Government
  * as represented by the Administrator of the National Aeronautics and Space
  * Administration. All rights reserved.
  *
@@ -81,6 +81,7 @@ export default {
         style() {
             let backgroundImage = 'url(' + this.item.url + ')';
             let border = '1px solid ' + this.item.stroke;
+
             if (this.itemStyle) {
                 if (this.itemStyle.imageUrl !== undefined) {
                     backgroundImage = 'url(' + this.itemStyle.imageUrl + ')';

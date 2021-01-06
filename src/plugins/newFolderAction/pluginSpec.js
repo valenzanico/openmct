@@ -40,9 +40,7 @@ describe("the plugin", () => {
         openmct.on('start', done);
         openmct.startHeadless();
 
-        newFolderAction = openmct.contextMenu._allActions.filter(action => {
-            return action.key === 'newFolder';
-        })[0];
+        newFolderAction = openmct.actions._allActions.newFolder;
     });
 
     afterEach(() => {
@@ -79,7 +77,7 @@ describe("the plugin", () => {
 
             spyOn(openmct.$injector, 'get').and.returnValue(mockDialogService);
             spyOn(compositionAPI, 'get').and.returnValue(mockComposition);
-            spyOn(openmct.objects, 'mutate');
+            spyOn(openmct.objects, 'save').and.returnValue(Promise.resolve(true));
 
             newFolderAction.invoke(mockObjectPath);
         });
@@ -89,7 +87,7 @@ describe("the plugin", () => {
         });
 
         it('creates a new folder object', () => {
-            expect(openmct.objects.mutate).toHaveBeenCalled();
+            expect(openmct.objects.save).toHaveBeenCalled();
         });
 
         it('adds new folder object to parent composition', () => {

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Open MCT Web, Copyright (c) 2014-2018, United States Government
+ * Open MCT Web, Copyright (c) 2014-2020, United States Government
  * as represented by the Administrator of the National Aeronautics and Space
  * Administration. All rights reserved.
  *
@@ -141,10 +141,11 @@
             <ConductorMode class="c-conductor__mode-select" />
             <ConductorTimeSystem class="c-conductor__time-system-select" />
             <ConductorHistory
-                v-if="isFixed"
                 class="c-conductor__history-select"
+                :offsets="openmct.time.clockOffsets()"
                 :bounds="bounds"
                 :time-system="timeSystem"
+                :mode="timeMode"
             />
         </div>
         <input
@@ -210,6 +211,11 @@ export default {
             isZooming: false
         };
     },
+    computed: {
+        timeMode() {
+            return this.isFixed ? 'fixed' : 'realtime';
+        }
+    },
     mounted() {
         document.addEventListener('keydown', this.handleKeyDown);
         document.addEventListener('keyup', this.handleKeyUp);
@@ -260,7 +266,7 @@ export default {
             this.isZooming = false;
 
             if (bounds) {
-                this.handleNewBounds(bounds);
+                this.openmct.time.bounds(bounds);
             } else {
                 this.setViewFromBounds(this.bounds);
             }

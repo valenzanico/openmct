@@ -1,5 +1,5 @@
 /*****************************************************************************
- * Open MCT, Copyright (c) 2014-2018, United States Government
+ * Open MCT, Copyright (c) 2014-2020, United States Government
  * as represented by the Administrator of the National Aeronautics and Space
  * Administration. All rights reserved.
  *
@@ -128,7 +128,7 @@ define([
     };
 
     ObjectServiceProvider.prototype.get = function (key) {
-        const keyString = utils.makeKeyString(key);
+        let keyString = utils.makeKeyString(key);
 
         return this.objectService.getObjects([keyString])
             .then(function (results) {
