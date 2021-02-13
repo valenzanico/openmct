@@ -74,10 +74,10 @@ const unknownObjectType = {
 };
 
 export default {
-    inject: ['openmct', 'domainObject', 'composition', 'objectPath'],
     components: {
         ObjectView
     },
+    inject: ['openmct', 'domainObject', 'composition', 'objectPath'],
     props: {
         isEditing: {
             type: Boolean,
